@@ -14,8 +14,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.UiModeManager;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +25,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.ProxyInfo;
-import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,7 +34,6 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
-import android.os.PersistableBundle;
 import android.os.RemoteException;
 import android.system.OsConstants;
 import android.text.TextUtils;
@@ -61,6 +57,8 @@ import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import de.blinkt.openvpn.LaunchVPN;
+import de.blinkt.openvpn.OpenVpnConnectionNetstatNotifier;
+import de.blinkt.openvpn.OpenVpnConnectionStateNotifier;
 import de.blinkt.openvpn.R;
 import de.blinkt.openvpn.VpnProfile;
 import de.blinkt.openvpn.activities.DisconnectVPN;
@@ -103,6 +101,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     private boolean mStarting = false;
     private long mConnecttime;
     private OpenVPNManagement mManagement;
+
     private final IBinder mBinder = new IOpenVPNServiceInternal.Stub() {
 
         @Override
@@ -732,6 +731,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
     @Override
     public void onDestroy() {
+        OpenVpnConnectionStateNotifier.notify("DISCONNECTED");
+
         synchronized (mProcessLock) {
             if (mProcessThread != null) {
                 mManagement.stopVPN(true);
@@ -1284,6 +1285,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         vpnstatus.putExtra("status", level.toString());
         vpnstatus.putExtra("detailstatus", state);
         sendBroadcast(vpnstatus, permission.ACCESS_NETWORK_STATE);
+        OpenVpnConnectionStateNotifier.notify(state);
     }
 
     @Override
@@ -1297,6 +1299,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
 
             showNotification(netstat, null, NOTIFICATION_CHANNEL_BG_ID, mConnecttime, LEVEL_CONNECTED, null);
+
+            OpenVpnConnectionNetstatNotifier.notify(String.valueOf(in), String.valueOf(out));
         }
 
     }
