@@ -75,7 +75,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'com.github.AntonSannikov'
             artifactId = 'openvpn_lib_android'
-            version = '0.0.7'
+            version = '0.0.8'
             afterEvaluate {
                 from components.release
             }
