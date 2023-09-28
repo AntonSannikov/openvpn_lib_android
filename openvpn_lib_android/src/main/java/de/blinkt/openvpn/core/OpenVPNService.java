@@ -650,15 +650,16 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             mProcessThread.start();
         }
 
-        if (!useOpenVPN3) {
-            try {
-                mProfile.writeConfigFileOutput(this, ((OpenVPNThread) processThread).getOpenVPNStdin());
-            } catch (IOException | ExecutionException | InterruptedException e) {
-                VpnStatus.logException("Error generating config file", e);
-                endVpnService();
-                return;
-            }
-        }
+//        if (!useOpenVPN3) {
+//            try {
+//                mProfile.writeConfigFileOutput(this, ((OpenVPNThread) processThread).getOpenVPNStdin());
+//            } catch (IOException | ExecutionException | InterruptedException e) {
+//                VpnStatus.logException("Error generating config file", e);
+//                endVpnService();
+//                return;
+//            }
+//        }
+
 
         final DeviceStateReceiver oldDeviceStateReceiver = mDeviceStateReceiver;
         final DeviceStateReceiver newDeviceStateReceiver = new DeviceStateReceiver(mManagement);
