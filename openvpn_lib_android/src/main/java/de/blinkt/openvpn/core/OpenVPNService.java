@@ -32,6 +32,7 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
@@ -731,7 +732,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
     @Override
     public void onDestroy() {
-        OpenVpnConnectionStateNotifier.notify("DISCONNECTED");
+        new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionStateNotifier.notify("DISCONNECTED"); });
 
         synchronized (mProcessLock) {
             if (mProcessThread != null) {
@@ -1300,7 +1301,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
             showNotification(netstat, null, NOTIFICATION_CHANNEL_BG_ID, mConnecttime, LEVEL_CONNECTED, null);
 
-            OpenVpnConnectionNetstatNotifier.notify(String.valueOf(in), String.valueOf(out));
+            new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionNetstatNotifier.notify(String.valueOf(in), String.valueOf(out));});
         }
 
     }
