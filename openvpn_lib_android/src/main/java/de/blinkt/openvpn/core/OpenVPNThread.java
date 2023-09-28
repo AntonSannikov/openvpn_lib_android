@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -130,7 +132,9 @@ public class OpenVPNThread implements Runnable {
         pb.environment().put("TMPDIR", mTmpDir);
 
         pb.redirectErrorStream(true);
+
         try {
+
             mProcess = pb.start();
             // Close the output, since we don't need it
 
@@ -154,7 +158,6 @@ public class OpenVPNThread implements Runnable {
                     int flags = Integer.parseInt(m.group(3), 16);
                     String msg = m.group(4);
                     int logLevel = flags & 0x0F;
-
                     VpnStatus.LogLevel logStatus = VpnStatus.LogLevel.INFO;
 
                     if ((flags & M_FATAL) != 0)
@@ -169,8 +172,10 @@ public class OpenVPNThread implements Runnable {
                     if (msg.startsWith("MANAGEMENT: CMD"))
                         logLevel = Math.max(4, logLevel);
 
+                    System.out.println(String.format("RRRRRRRRRRR--- %s", msg));
                     VpnStatus.logMessageOpenVPN(logStatus, logLevel, msg);
                     VpnStatus.addExtraHints(msg);
+
                 } else {
                     VpnStatus.logInfo("P:" + logline);
                 }
@@ -179,7 +184,8 @@ public class OpenVPNThread implements Runnable {
                     throw new InterruptedException("OpenVpn process was killed form java code");
                 }
             }
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException | IOException | CancellationException e ) {
+            System.out.println(e);
             VpnStatus.logException("Error reading from output of OpenVPN process", e);
             mStreamFuture.cancel(true);
             stopProcess();
@@ -191,6 +197,7 @@ public class OpenVPNThread implements Runnable {
     private String genLibraryPath(String[] argv, ProcessBuilder pb) {
         // Hack until I find a good way to get the real library path
         String applibpath = argv[0].replaceFirst("/cache/.*$", "/lib");
+
 
         String lbpath = pb.environment().get("LD_LIBRARY_PATH");
         if (lbpath == null)
@@ -205,6 +212,7 @@ public class OpenVPNThread implements Runnable {
     }
 
     public OutputStream getOpenVPNStdin() throws ExecutionException, InterruptedException {
+
         return mStreamFuture.get();
     }
 }
