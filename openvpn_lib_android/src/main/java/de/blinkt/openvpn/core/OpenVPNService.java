@@ -1287,7 +1287,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         vpnstatus.putExtra("status", level.toString());
         vpnstatus.putExtra("detailstatus", state);
         sendBroadcast(vpnstatus, permission.ACCESS_NETWORK_STATE);
-        OpenVpnConnectionStateNotifier.notify(state);
+        new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionStateNotifier.notify(state); });
     }
 
     @Override
@@ -1302,7 +1302,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
             showNotification(netstat, null, NOTIFICATION_CHANNEL_BG_ID, mConnecttime, LEVEL_CONNECTED, null);
 
-            new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionNetstatNotifier.notify(String.valueOf(in), String.valueOf(out));});
+            new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionNetstatNotifier.notify(String.valueOf(in), String.valueOf(out)); });
         }
 
     }
