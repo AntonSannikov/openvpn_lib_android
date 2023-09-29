@@ -1,10 +1,16 @@
-package de.blinkt.openvpn;
+package de.blinkt.openvpn.notifiers;
+
+import androidx.annotation.Nullable;
 
 public class OpenVpnConnectionNetstatNotifier {
+
+    @Nullable
     private static OpenVpnConnectionNetstatListener _listener;
 
     public static void notify(String byteIn, String byteOut) {
-        _listener.onEvent(byteIn, byteOut);
+        if (_listener != null) {
+            _listener.onEvent(byteIn, byteOut);
+        }
     }
 
     public static void setListener(OpenVpnConnectionNetstatListener listener) {

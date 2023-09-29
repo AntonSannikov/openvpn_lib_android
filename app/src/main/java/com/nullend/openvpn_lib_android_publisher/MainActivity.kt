@@ -20,9 +20,10 @@ import androidx.compose.ui.graphics.Color
 import com.nullend.openvpn_lib_android_publisher.ui.theme.Openvpn_lib_android_publisherTheme
 import de.blinkt.openvpn.LaunchVPN
 import de.blinkt.openvpn.OpenVpnApi
-import de.blinkt.openvpn.OpenVpnConnectionNetstatNotifier
-import de.blinkt.openvpn.OpenVpnConnectionStateNotifier
+import de.blinkt.openvpn.notifiers.OpenVpnConnectionNetstatNotifier
+import de.blinkt.openvpn.notifiers.OpenVpnConnectionStateNotifier
 import de.blinkt.openvpn.activities.DisconnectVPN
+import de.blinkt.openvpn.notifiers.OpenVpnLogNotifier
 
 
 class MainActivity : ComponentActivity() {
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
         ActivityResultNotifier.addListener(::onActivityResult)
         OpenVpnConnectionStateNotifier.setListener { onVpnConnectionStateChanged(it) }
         OpenVpnConnectionNetstatNotifier.setListener { byteIn, byteOut ->  onVpnConnectionNetstatChanged(byteIn, byteOut)}
+        OpenVpnLogNotifier.setListener { onLogEvent(it) }
         setContent {
             Openvpn_lib_android_publisherTheme {
                 // A surface container using the 'background' color from the theme
@@ -77,6 +79,10 @@ class MainActivity : ComponentActivity() {
 
     private fun onVpnConnectionNetstatChanged(byteIn: String, byteOut: String) {
         Log.d("--NETSTAT--", "$byteIn;$byteOut")
+    }
+
+    private fun onLogEvent(message: String) {
+        Log.d("--LOG--", "$message")
     }
 }
 

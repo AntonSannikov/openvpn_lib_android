@@ -6,6 +6,8 @@
 package de.blinkt.openvpn.core;
 
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -31,7 +33,10 @@ import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.blinkt.openvpn.OpenVpnApi;
 import de.blinkt.openvpn.R;
+import de.blinkt.openvpn.notifiers.OpenVpnConnectionStateNotifier;
+import de.blinkt.openvpn.notifiers.OpenVpnLogNotifier;
 
 public class OpenVPNThread implements Runnable {
     private static final String DUMP_PATH_STRING = "Dump path: ";
@@ -172,7 +177,8 @@ public class OpenVPNThread implements Runnable {
                     if (msg.startsWith("MANAGEMENT: CMD"))
                         logLevel = Math.max(4, logLevel);
 
-                    System.out.println(String.format("RRRRRRRRRRR--- %s", msg));
+                    OpenVpnApi.mainHandler.post(() -> { OpenVpnLogNotifier.notify(msg); });
+
                     VpnStatus.logMessageOpenVPN(logStatus, logLevel, msg);
                     VpnStatus.addExtraHints(msg);
 

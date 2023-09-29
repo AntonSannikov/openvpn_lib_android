@@ -58,8 +58,9 @@ import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import de.blinkt.openvpn.LaunchVPN;
-import de.blinkt.openvpn.OpenVpnConnectionNetstatNotifier;
-import de.blinkt.openvpn.OpenVpnConnectionStateNotifier;
+import de.blinkt.openvpn.OpenVpnApi;
+import de.blinkt.openvpn.notifiers.OpenVpnConnectionNetstatNotifier;
+import de.blinkt.openvpn.notifiers.OpenVpnConnectionStateNotifier;
 import de.blinkt.openvpn.R;
 import de.blinkt.openvpn.VpnProfile;
 import de.blinkt.openvpn.activities.DisconnectVPN;
@@ -732,7 +733,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
     @Override
     public void onDestroy() {
-        new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionStateNotifier.notify("DISCONNECTED"); });
+
+        OpenVpnApi.mainHandler.post(() -> { OpenVpnConnectionStateNotifier.notify("DISCONNECTED"); });
 
         synchronized (mProcessLock) {
             if (mProcessThread != null) {
@@ -1286,7 +1288,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         vpnstatus.putExtra("status", level.toString());
         vpnstatus.putExtra("detailstatus", state);
         sendBroadcast(vpnstatus, permission.ACCESS_NETWORK_STATE);
-        new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionStateNotifier.notify(state); });
+        OpenVpnApi.mainHandler.post(() -> { OpenVpnConnectionStateNotifier.notify(state); });
     }
 
     @Override
@@ -1300,9 +1302,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
 
             showNotification(netstat, null, NOTIFICATION_CHANNEL_BG_ID, mConnecttime, LEVEL_CONNECTED, null);
+
             String byteIn = humanReadableByteCount(diffIn / OpenVPNManagement.mBytecountInterval, true, getResources());
             String byteOut = humanReadableByteCount(diffOut / OpenVPNManagement.mBytecountInterval, true, getResources());
-            new Handler(Looper.getMainLooper()).post(() -> { OpenVpnConnectionNetstatNotifier.notify(byteIn, byteOut); });
+            OpenVpnApi.mainHandler.post(() -> { OpenVpnConnectionNetstatNotifier.notify(byteIn, byteOut); });
         }
 
     }
