@@ -28,7 +28,6 @@ import de.blinkt.openvpn.listeners.OpenVpnLogListener
 
 class MainActivity : ComponentActivity() {
 
-    private val mOpenVpnApi: OpenVpnApi = OpenVpnApi()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityResultNotifier.addListener(::onActivityResult)
@@ -72,7 +71,7 @@ class MainActivity : ComponentActivity() {
         val name = OvpnTestConfig.name
         val username = OvpnTestConfig.username
         val password = OvpnTestConfig.password
-        val profile = mOpenVpnApi.createVpnProfile(this, config, name, username, password)
+        val profile = OpenVpnApi.createVpnProfile(this, config, name, username, password)
         val intent = Intent(this, LaunchVPN::class.java)
         intent.putExtra(LaunchVPN.EXTRA_KEY, profile.uuid.toString())
         intent.putExtra(LaunchVPN.EXTRA_START_REASON, "main profile list")

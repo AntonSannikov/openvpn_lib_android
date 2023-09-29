@@ -63,7 +63,7 @@ public class OpenVpnApi {
 
 
 
-    public VpnProfile createVpnProfile(Context context, String config, String name, String username, String password) throws RemoteException {
+    public static VpnProfile createVpnProfile(Context context, String config, String name, String username, String password) throws RemoteException {
         try {
             ConfigParser cp = new ConfigParser();
             cp.parseConfig(new StringReader(config));
