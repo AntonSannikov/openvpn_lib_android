@@ -1,5 +1,7 @@
 package com.nullend.openvpn_lib_android_publisher
 
+import android.app.ActivityManager
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -28,8 +30,11 @@ import de.blinkt.openvpn.listeners.OpenVpnLogListener
 
 class MainActivity : ComponentActivity() {
 
+    private val openVpnApi: OpenVpnApi = OpenVpnApi()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        openVpnApi.initialize(this)
         ActivityResultNotifier.addListener(::onActivityResult)
         OpenVpnApi.setListener(object: OpenVpnConnectionStateListener {
             override fun onEvent(state: String) {
