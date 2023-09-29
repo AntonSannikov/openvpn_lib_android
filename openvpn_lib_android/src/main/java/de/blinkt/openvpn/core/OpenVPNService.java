@@ -32,7 +32,6 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
@@ -59,8 +58,6 @@ import java.util.concurrent.ExecutionException;
 
 import de.blinkt.openvpn.LaunchVPN;
 import de.blinkt.openvpn.OpenVpnApi;
-import de.blinkt.openvpn.notifiers.OpenVpnConnectionNetstatNotifier;
-import de.blinkt.openvpn.notifiers.OpenVpnConnectionStateNotifier;
 import de.blinkt.openvpn.R;
 import de.blinkt.openvpn.VpnProfile;
 import de.blinkt.openvpn.activities.DisconnectVPN;
@@ -734,7 +731,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     @Override
     public void onDestroy() {
 
-        OpenVpnApi.mainHandler.post(() -> { OpenVpnConnectionStateNotifier.notify("DISCONNECTED"); });
+        OpenVpnApi.notify(new String[] {"DISCONNECTED"}, OpenVpnApi.Notifier.CONNECTION_STATE);
 
         synchronized (mProcessLock) {
             if (mProcessThread != null) {
@@ -1288,7 +1285,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         vpnstatus.putExtra("status", level.toString());
         vpnstatus.putExtra("detailstatus", state);
         sendBroadcast(vpnstatus, permission.ACCESS_NETWORK_STATE);
-        OpenVpnApi.mainHandler.post(() -> { OpenVpnConnectionStateNotifier.notify(state); });
+
+        OpenVpnApi.notify(new String[] {state}, OpenVpnApi.Notifier.CONNECTION_STATE);
     }
 
     @Override
@@ -1305,9 +1303,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
             String byteIn = humanReadableByteCount(diffIn / OpenVPNManagement.mBytecountInterval, true, getResources());
             String byteOut = humanReadableByteCount(diffOut / OpenVPNManagement.mBytecountInterval, true, getResources());
-            OpenVpnApi.mainHandler.post(() -> { OpenVpnConnectionNetstatNotifier.notify(byteIn, byteOut); });
+            OpenVpnApi.notify(new String[] {byteIn, byteOut}, OpenVpnApi.Notifier.NETSTAT);
         }
-
     }
 
     @Override

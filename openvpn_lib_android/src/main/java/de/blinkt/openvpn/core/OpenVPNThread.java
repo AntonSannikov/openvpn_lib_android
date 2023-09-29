@@ -6,13 +6,10 @@
 package de.blinkt.openvpn.core;
 
 import android.annotation.SuppressLint;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,19 +21,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.blinkt.openvpn.OpenVpnApi;
 import de.blinkt.openvpn.R;
-import de.blinkt.openvpn.notifiers.OpenVpnConnectionStateNotifier;
-import de.blinkt.openvpn.notifiers.OpenVpnLogNotifier;
+
 
 public class OpenVPNThread implements Runnable {
     private static final String DUMP_PATH_STRING = "Dump path: ";
@@ -177,7 +170,7 @@ public class OpenVPNThread implements Runnable {
                     if (msg.startsWith("MANAGEMENT: CMD"))
                         logLevel = Math.max(4, logLevel);
 
-                    OpenVpnApi.mainHandler.post(() -> { OpenVpnLogNotifier.notify(msg); });
+                    OpenVpnApi.notify(new String[] {msg}, OpenVpnApi.Notifier.LOG);
 
                     VpnStatus.logMessageOpenVPN(logStatus, logLevel, msg);
                     VpnStatus.addExtraHints(msg);

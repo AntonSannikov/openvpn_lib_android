@@ -20,10 +20,10 @@ import androidx.compose.ui.graphics.Color
 import com.nullend.openvpn_lib_android_publisher.ui.theme.Openvpn_lib_android_publisherTheme
 import de.blinkt.openvpn.LaunchVPN
 import de.blinkt.openvpn.OpenVpnApi
-import de.blinkt.openvpn.notifiers.OpenVpnConnectionNetstatNotifier
-import de.blinkt.openvpn.notifiers.OpenVpnConnectionStateNotifier
 import de.blinkt.openvpn.activities.DisconnectVPN
-import de.blinkt.openvpn.notifiers.OpenVpnLogNotifier
+import de.blinkt.openvpn.listeners.OpenVpnConnectionNetstatListener
+import de.blinkt.openvpn.listeners.OpenVpnConnectionStateListener
+import de.blinkt.openvpn.listeners.OpenVpnLogListener
 
 
 class MainActivity : ComponentActivity() {
@@ -32,9 +32,22 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityResultNotifier.addListener(::onActivityResult)
-        OpenVpnConnectionStateNotifier.setListener { onVpnConnectionStateChanged(it) }
-        OpenVpnConnectionNetstatNotifier.setListener { byteIn, byteOut ->  onVpnConnectionNetstatChanged(byteIn, byteOut)}
-        OpenVpnLogNotifier.setListener { onLogEvent(it) }
+        OpenVpnApi.setListener(object: OpenVpnConnectionStateListener {
+            override fun onEvent(state: String) {
+                onVpnConnectionStateChanged(state)
+            }
+        })
+        OpenVpnApi.setListener(object: OpenVpnConnectionNetstatListener {
+            override fun onEvent(arg1: String, arg2: String) {
+                onVpnConnectionNetstatChanged(arg1, arg2)
+            }
+        })
+        OpenVpnApi.setListener(object: OpenVpnLogListener {
+            override fun onEvent(message: String) {
+                onLogEvent(message)
+            }
+        })
+
         setContent {
             Openvpn_lib_android_publisherTheme {
                 // A surface container using the 'background' color from the theme
