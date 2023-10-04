@@ -104,7 +104,7 @@ public class OpenVpnApi {
         // Background message
         CharSequence name = ctx.getString(R.string.channel_name_background);
         NotificationChannel mChannel = new NotificationChannel(OpenVPNService.NOTIFICATION_CHANNEL_BG_ID,
-                name, NotificationManager.IMPORTANCE_MIN);
+                name, NotificationManager.IMPORTANCE_HIGH);
 
         mChannel.setDescription(ctx.getString(R.string.channel_description_background));
         mChannel.enableLights(false);
@@ -115,7 +115,7 @@ public class OpenVpnApi {
         // Connection status change messages
         name = ctx.getString(R.string.channel_name_status);
         mChannel = new NotificationChannel(OpenVPNService.NOTIFICATION_CHANNEL_NEWSTATUS_ID,
-                name, NotificationManager.IMPORTANCE_LOW);
+                name, NotificationManager.IMPORTANCE_HIGH);
 
         mChannel.setDescription(ctx.getString(R.string.channel_description_status));
         mChannel.enableLights(true);

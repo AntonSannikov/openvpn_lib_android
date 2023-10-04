@@ -197,7 +197,6 @@ public class OpenVPNThread implements Runnable {
         // Hack until I find a good way to get the real library path
         String applibpath = argv[0].replaceFirst("/cache/.*$", "/lib");
 
-
         String lbpath = pb.environment().get("LD_LIBRARY_PATH");
         if (lbpath == null)
             lbpath = applibpath;
